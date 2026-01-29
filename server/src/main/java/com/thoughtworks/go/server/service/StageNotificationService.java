@@ -122,7 +122,7 @@ public class StageNotificationService {
 
         private String useConfiguredSiteUrl(String urlString) {
             try {
-                return StageNotificationService.this.serverConfigService.siteUrlFor(urlString, false);
+                return StageNotificationService.this.serverConfigService.siteUrlFor(urlString);
             } catch (URISyntaxException e) {
                 throw bomb("Could not construct URL.", e);
             }

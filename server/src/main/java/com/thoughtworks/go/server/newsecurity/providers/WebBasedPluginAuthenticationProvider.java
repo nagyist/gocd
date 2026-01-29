@@ -32,11 +32,12 @@ import com.thoughtworks.go.util.Clock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Component
 public class WebBasedPluginAuthenticationProvider extends AbstractPluginAuthenticationProvider<AccessToken> {
@@ -90,9 +91,9 @@ public class WebBasedPluginAuthenticationProvider extends AbstractPluginAuthenti
 
     private String rootUrlFrom(String urlString) {
         try {
-            final URL url = new URL(urlString);
-            return new URL(url.getProtocol(), url.getHost(), url.getPort(), "").toString();
-        } catch (MalformedURLException e) {
+            final URI url = new URI(urlString);
+            return new URI(url.getScheme(), null, url.getHost(), url.getPort(), null, null, null).toString();
+        } catch (URISyntaxException e) {
             throw new RuntimeException(String.format("Configured siteUrl [%s] does not appear to be a valid URL", urlString), e);
         }
     }
@@ -108,11 +109,11 @@ public class WebBasedPluginAuthenticationProvider extends AbstractPluginAuthenti
         return goConfigService.security().securityAuthConfigs().findByPluginId(pluginId);
     }
 
-    public AuthorizationServerUrlResponse getAuthorizationServerUrl(String pluginId, String alternateRootUrl) {
+    public AuthorizationServerUrlResponse getAuthorizationServerUrl(String pluginId, Supplier<String> alternateRootUrlSupplier) {
         String chosenRootUrl =
             goConfigService.serverConfig().hasAnyUrlConfigured()
                 ? rootUrlFrom(goConfigService.serverConfig().getSiteUrlPreferablySecured().getUrl())
-                : alternateRootUrl;
+                : alternateRootUrlSupplier.get();
 
         return authorizationExtension.getAuthorizationServerUrl(pluginId, getAuthConfigs(pluginId), chosenRootUrl);
     }

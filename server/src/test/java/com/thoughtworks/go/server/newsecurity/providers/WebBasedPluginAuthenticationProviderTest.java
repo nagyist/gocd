@@ -309,7 +309,7 @@ class WebBasedPluginAuthenticationProviderTest {
         when(serverConfig.hasAnyUrlConfigured()).thenReturn(true);
         when(serverConfig.getSiteUrlPreferablySecured()).thenReturn(new SecureSiteUrl("https://foo.bar.com"));
 
-        authenticationProvider.getAuthorizationServerUrl(PLUGIN_ID, "https://example.com");
+        authenticationProvider.getAuthorizationServerUrl(PLUGIN_ID, () -> "https://example.com");
 
         verify(authorizationExtension, never()).getAuthorizationServerUrl(PLUGIN_ID, List.of(githubSecurityAuthconfig), "https://example.com");
         verify(authorizationExtension).getAuthorizationServerUrl(PLUGIN_ID, List.of(githubSecurityAuthconfig), "https://foo.bar.com");
@@ -321,7 +321,7 @@ class WebBasedPluginAuthenticationProviderTest {
         when(goConfigService.serverConfig()).thenReturn(serverConfig);
         when(serverConfig.hasAnyUrlConfigured()).thenReturn(false);
 
-        authenticationProvider.getAuthorizationServerUrl(PLUGIN_ID, "https://example.com");
+        authenticationProvider.getAuthorizationServerUrl(PLUGIN_ID, () -> "https://example.com");
 
         verify(authorizationExtension).getAuthorizationServerUrl(PLUGIN_ID, List.of(githubSecurityAuthconfig), "https://example.com");
     }
@@ -333,7 +333,7 @@ class WebBasedPluginAuthenticationProviderTest {
         when(serverConfig.hasAnyUrlConfigured()).thenReturn(true);
         when(serverConfig.getSiteUrlPreferablySecured()).thenReturn(new SecureSiteUrl("https://badurl:3434:"));
 
-        assertThatThrownBy(() -> authenticationProvider.getAuthorizationServerUrl(PLUGIN_ID, "https://example.com"))
+        assertThatThrownBy(() -> authenticationProvider.getAuthorizationServerUrl(PLUGIN_ID, () -> "https://example.com"))
             .isInstanceOf(RuntimeException.class)
             .hasMessageContaining("does not appear to be a valid URL")
             .hasCauseInstanceOf(MalformedURLException.class);

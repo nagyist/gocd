@@ -24,7 +24,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -50,8 +51,9 @@ public enum DownloadableFile {
     public String validatedUrl(ServerUrlGenerator urlGenerator) {
         String url = url(urlGenerator);
         try {
-            new URL(url);
-        } catch (MalformedURLException mue) {
+            //noinspection ResultOfMethodCallIgnored
+            new URI(url).toURL();
+        } catch (URISyntaxException | MalformedURLException mue) {
             throw new RuntimeException(
                     "URL you provided to access Go Server: " + url(urlGenerator) + " is not valid");
         }

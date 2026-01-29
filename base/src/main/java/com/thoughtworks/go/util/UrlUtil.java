@@ -16,9 +16,7 @@
 package com.thoughtworks.go.util;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.function.Function;
@@ -44,10 +42,10 @@ public class UrlUtil {
         return fromString(url, RuntimeException::new);
     }
 
-    public static URL fromString(String url, Function<MalformedURLException, RuntimeException> exceptionSupplier) {
+    public static URL fromString(String url, Function<Exception, RuntimeException> exceptionSupplier) {
         try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
+            return new URI(url).toURL();
+        } catch (URISyntaxException | MalformedURLException e) {
             throw exceptionSupplier.apply(e);
         }
     }

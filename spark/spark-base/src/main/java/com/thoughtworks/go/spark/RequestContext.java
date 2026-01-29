@@ -18,7 +18,8 @@ package com.thoughtworks.go.spark;
 import spark.Request;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class RequestContext {
 
@@ -42,18 +43,14 @@ public class RequestContext {
         return new Link(name, urlFor(pathAfterContext));
     }
 
-    public String pathWithContext(String pathAfterContext) {
-        try {
-            return new URL(protocol, host, port, contextPath + pathAfterContext).getPath();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
-        }
+    public String pathFor(String pathAfterContext) {
+        return contextPath + pathAfterContext;
     }
 
     public String urlFor(String pathAfterContext) {
         try {
-            return new URL(protocol, host, port, contextPath + pathAfterContext).toExternalForm();
-        } catch (MalformedURLException e) {
+            return new URI(protocol, null, host, port, contextPath + pathAfterContext, null, null).toURL().toString();
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
